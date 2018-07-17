@@ -222,13 +222,12 @@ function getDerivativeUrns(derivative, format, getThumbnail, objectIds) {
                     }
                 } else {
                     res.push(child.urn);
-                    return res;
                 }
             }
         }
     }
 
-    return null;
+    return res;
 }
 
 // OBJ: guid & objectIds are also needed
@@ -484,21 +483,13 @@ function fillFormats() {
 
                         // url encode it
                         if (derUrns) {
-                            derUrns[0] = encodeURIComponent(derUrns[0]);
-
-                            downloadDerivative(urn, derUrns[0], fileName);
-
-                            // in case of obj format, also try to download the material
-                            if (format === 'obj') {
-                                // The MTL file needs to have the exact name that it has on OSS
-                                // because that's how it's referenced from the OBJ file
-                                var ossName = decodeURIComponent(derUrns[0]);
-                                var ossNameParts = ossName.split("/");
+                            derUrns.forEach( item  => {
+                                var itemEncoded = encodeURIComponent(item);
+                                var dwgFileParts = item.split("/");
                                 // Get the last element
-                                ossName = ossNameParts[ossNameParts.length - 1];
-
-                                downloadDerivative(urn, derUrns[0].replace('.obj' , '.mtl'), ossName.replace('.obj', '.mtl'));
-                            }
+                                fileName = dwgFileParts[dwgFileParts.length - 1];                
+                                downloadDerivative(urn, itemEncoded, fileName);
+                            });
                         } else {
                             showProgress("Could not find specific OBJ file", "failed");
                             console.log("askForFileType, Did not find the OBJ translation with the correct list of objectIds");
